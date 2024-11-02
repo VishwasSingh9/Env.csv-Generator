@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Env.csv Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Background Video -->
+    <video autoplay muted loop id="backgroundVideo">
+        <source src="Zippy-3.mp4" type="video/mp4">
+        Your browser does not support HTML5 video.
+    </video>
+
+    <!-- Main Button to open shape selection modal -->
+    <div class="center-button">
+        <button id="generateEnvButton">Generate Env.csv</button>
+    </div>
+
+    <!-- Initial Shape Selection Modal -->
+    <div id="shapeSelectionModal" class="modal">
+        <div class="modal-content">
+            <h2>Select Shape Type</h2>
+            <button onclick="openRegularShapeModal()">Regular Shape</button>
+            <button onclick="openIrregularShapeModal()">Irregular Shape</button>
+            <button onclick="closeModal('shapeSelectionModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Irregular Shape Input Modal -->
+    <div id="irregularShapeModal" class="modal">
+        <div class="modal-content">
+            <h2>Irregular Shape Inputs</h2>
+            <div id="inputFieldsContainer">
+            </div>
+            <button onclick="addIrregularShapeFields()">+</button>
+            <button onclick="generateCSV()">Generate</button>
+            <button onclick="closeModal('irregularShapeModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Regular Shape Options Modal -->
+    <div id="regularShapeModal" class="modal">
+        <div class="modal-content">
+            <h2>Select Regular Shape</h2>
+            <button onclick="selectShape('Rectangular')">Rectangular</button>
+            <button onclick="selectShape('Square')">Square</button>
+            <button onclick="selectShape('C-Shaped')">C-Shaped</button>
+            <button onclick="selectShape('E-Shaped')">E-Shaped</button>
+            <button onclick="selectShape('H-Shaped')">H-Shaped</button>
+            <button onclick="closeModal('regularShapeModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Rectangular Shape Input Modal -->
+    <div id="rectangularShapeModal" class="modal">
+        <div class="modal-content">
+            <h2>Rectangular Shape Inputs</h2>
+            <input type="number" id="rectRows" placeholder="Number of Rows">
+            <input type="number" id="rectCols" placeholder="Number of Columns">
+            <input type="number" id="rectStartBarcode" placeholder="Starting Barcode Number">
+            <input type="number" id="rectEndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="rectDistance" placeholder="Distance Between Barcodes">
+            <input type="number" id="rectInitialX" placeholder="Initial X Value">
+            <input type="number" id="rectInitialY" placeholder="Initial Y Value">
+            <select id="rectAxis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+            <button onclick="generateRectangularCSV()">Generate</button>
+            <button onclick="closeModal('rectangularShapeModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Square Shape Input Modal -->
+    <div id="squareShapeModal" class="modal">
+        <div class="modal-content">
+            <h2>Square Shape Inputs</h2>
+            <input type="number" id="squareRows" placeholder="Number of Rows (Equal to Columns)" oninput="syncSquareCols()">
+            <input type="number" id="squareCols" placeholder="Number of Columns" disabled>
+            <input type="number" id="squareStartBarcode" placeholder="Starting Barcode Number">
+            <input type="number" id="squareEndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="squareDistance" placeholder="Distance Between Barcodes">
+            <input type="number" id="squareInitialX" placeholder="Initial X Value">
+            <input type="number" id="squareInitialY" placeholder="Initial Y Value">
+            <select id="squareAxis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+            <button onclick="generateSquareCSV()">Generate</button>
+            <button onclick="closeModal('squareShapeModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- C-Shaped Input Modal -->
+    <div id="cShapedModal" class="modal">
+        <div class="modal-content">
+            <h2>C-Shaped Inputs</h2>
+            <!-- Main Rectangle Inputs -->
+            <h3>Main Rectangle</h3>
+            <input type="number" id="cMainRows" placeholder="Rows">
+            <input type="number" id="cMainCols" placeholder="Columns">
+            <input type="number" id="cMainInitialX" placeholder="Initial X Value">
+            <input type="number" id="cMainInitialY" placeholder="Initial Y Value">
+            <input type="number" id="cMainStartBarcode" placeholder="Starting Barcode Number">
+            <input type="number" id="cMainEndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="cMainDistance" placeholder="Distance Between Barcodes">
+            <select id="cMainAxis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+            <!-- Finger 1 Inputs -->
+            <h3>Finger 1</h3>
+            <input type="number" id="cFinger1Rows" placeholder="Rows">
+            <input type="number" id="cFinger1Cols" placeholder="Columns">
+            <input type="number" id="cFinger1InitialX" placeholder="Initial X Value">
+            <input type="number" id="cFinger1InitialY" placeholder="Initial Y Value">
+            <input type="number" id="cFinger1StartBarcode" placeholder="Starting Barcode Number">
+            <input type="number" id="cFinger1EndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="cFinger1Distance" placeholder="Distance Between Barcodes">
+            <select id="cFinger1Axis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+            <!-- Finger 2 Inputs -->
+            <h3>Finger 2</h3>
+            <input type="number" id="cFinger2Rows" placeholder="Rows">
+            <input type="number" id="cFinger2Cols" placeholder="Columns">
+            <input type="number" id="cFinger2InitialX" placeholder="Initial X Value">
+            <input type="number" id="cFinger2InitialY" placeholder="Initial Y Value">
+            <input type="number" id="cFinger2StartBarcode" placeholder="tarting Barcode Number">
+            <input type="number" id="cFinger2EndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="cFinger2Distance" placeholder="Distance Between Barcodes">
+            <select id="cFinger2Axis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+
+            <button onclick="generateCShapeCSV()">Generate</button>
+            <button onclick="closeModal('cShapedModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- E-Shaped Input Modal -->
+    <div id="eShapedModal" class="modal">
+        <div class="modal-content">
+            <h2>E-Shaped Inputs</h2>
+            <!-- Main Rectangle Inputs -->
+            <h3>Main Rectangle</h3>
+            <input type="number" id="eMainRows" placeholder="Rows">
+            <input type="number" id="eMainCols" placeholder="Columns">
+            <input type="number" id="eMainInitialX" placeholder="Initial X Value">
+            <input type="number" id="eMainInitialY" placeholder="Initial Y Value">
+            <input type="number" id="eMainStartBarcode" placeholder="Starting Barcode Number">
+            <input type="number" id="eMainEndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="eMainDistance" placeholder="Distance Between Barcodes">
+            <select id="eMainAxis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+            <!-- Finger 1 Inputs -->
+            <h3>Finger 1</h3>
+            <input type="number" id="eFinger1Rows" placeholder="Rows">
+            <input type="number" id="eFinger1Cols" placeholder="Columns">
+            <input type="number" id="eFinger1InitialX" placeholder="Initial X Value">
+            <input type="number" id="eFinger1InitialY" placeholder="Initial Y Value">
+            <input type="number" id="eFinger1StartBarcode" placeholder="Starting Barcode Number">
+            <input type="number" id="eFinger1EndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="eFinger1Distance" placeholder="Distance Between Barcodes">
+            <select id="eFinger1Axis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+            <!-- Finger 2 Inputs -->
+            <h3>Finger 2</h3>
+            <input type="number" id="eFinger2Rows" placeholder="Rows">
+            <input type="number" id="eFinger2Cols" placeholder="Columns">
+            <input type="number" id="eFinger2InitialX" placeholder="Initial X Value">
+            <input type="number" id="eFinger2InitialY" placeholder="Initial Y Value">
+            <input type="number" id="eFinger2StartBarcode" placeholder="Starting Barcode Number">
+            <input type="number" id="eFinger2EndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="eFinger2Distance" placeholder="Distance Between Barcodes">
+            <select id="eFinger2Axis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+            <!-- Finger 3 Inputs -->
+            <h3>Finger 3</h3>
+            <input type="number" id="eFinger3Rows" placeholder="Rows">
+            <input type="number" id="eFinger3Cols" placeholder="Columns">
+            <input type="number" id="eFinger3InitialX" placeholder="Initial X Value">
+            <input type="number" id="eFinger3InitialY" placeholder="Initial Y Value">
+            <input type="number" id="eFinger3StartBarcode" placeholder="Starting Barcode Number">
+            <input type="number" id="eFinger3EndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="eFinger3Distance" placeholder="Distance Between Barcodes">
+            <select id="eFinger3Axis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+    
+            <button onclick="generateEShapeCSV()">Generate</button>
+            <button onclick="closeModal('eShapedModal')">Cancel</button>
+        </div>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>
