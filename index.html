@@ -19,6 +19,7 @@
     <!-- Main Button to open shape selection modal -->
     <div class="center-button">
         <button id="generateEnvButton">Generate Env.csv</button>
+        <button id="generateFleetMapButton" onclick="openFleetMapModal()">Generate Map</button>
     </div>
 
     <!-- Initial Shape Selection Modal -->
@@ -51,7 +52,9 @@
             <button onclick="selectShape('Square')">Square</button>
             <button onclick="selectShape('C-Shaped')">C-Shaped</button>
             <button onclick="selectShape('E-Shaped')">E-Shaped</button>
-            <button onclick="selectShape('H-Shaped')">H-Shaped</button>
+            <!-- <button onclick="selectShape('H-Shaped')">H-Shaped</button> -->
+            <button onclick="selectShape('comb-Shaped')">Comb-Shaped</button>
+            <button onclick="selectShape('hollow-Rectangle')">Hollow Rectangle</button>
             <button onclick="closeModal('regularShapeModal')">Cancel</button>
         </div>
     </div>
@@ -132,7 +135,7 @@
             <input type="number" id="cFinger2Cols" placeholder="Columns">
             <input type="number" id="cFinger2InitialX" placeholder="Initial X Value">
             <input type="number" id="cFinger2InitialY" placeholder="Initial Y Value">
-            <input type="number" id="cFinger2StartBarcode" placeholder="tarting Barcode Number">
+            <input type="number" id="cFinger2StartBarcode" placeholder="Starting Barcode Number">
             <input type="number" id="cFinger2EndBarcode" placeholder="End Barcode Number">
             <input type="number" id="cFinger2Distance" placeholder="Distance Between Barcodes">
             <select id="cFinger2Axis">
@@ -204,6 +207,280 @@
     
             <button onclick="generateEShapeCSV()">Generate</button>
             <button onclick="closeModal('eShapedModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Comb-Shaped Input Modal -->
+    <div id="combShapedModal" class="modal">
+        <div class="modal-content">
+            <h2>Comb-Shaped Inputs</h2>
+            <!-- Main Rectangle Inputs -->
+            <h3>Main Rectangle</h3>
+            <input type="number" id="combMainRows" placeholder="Rows">
+            <input type="number" id="combMainCols" placeholder="Columns">
+            <input type="number" id="combMainInitialX" placeholder="Initial X Value">
+            <input type="number" id="combMainInitialY" placeholder="Initial Y Value">
+            <input type="number" id="combMainStartBarcode" placeholder="Starting Barcode Number">
+            <input type="number" id="combMainEndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="combMainDistance" placeholder="Distance Between Barcodes">
+            <select id="combMainAxis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+            <!-- Finger Section -->
+            <div id="combFingersContainer">
+                <h3>Finger 1</h3>
+                <div class="finger-inputs">
+                    <input type="number" placeholder="Rows" class="fingerRows">
+                    <input type="number" placeholder="Columns" class="fingerCols">
+                    <input type="number" placeholder="Initial X Value" class="fingerInitialX">
+                    <input type="number" placeholder="Initial Y Value" class="fingerInitialY">
+                    <input type="number" placeholder="Starting Barcode" class="fingerStartBarcode">
+                    <input type="number" placeholder="End Barcode" class="fingerEndBarcode">
+                    <input type="number" placeholder="Distance Between Barcodes" class="fingerDistance">
+                    <select class="fingerAxis">
+                        <option value="x">Increase in X Axis</option>
+                        <option value="y">Increase in Y Axis</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="addFinger()">Add Finger</button>
+            <button onclick="generateCombShapeCSV()">Generate</button>
+            <button onclick="closeModal('combShapedModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Hollow Rectangle Input Modal -->
+    <div id="hollowRectangleModal" class="modal">
+        <div class="modal-content">
+            <h2>Hollow Rectangle Inputs</h2>
+            <!-- Hollow Rectangle Inputs -->
+            <input type="number" id="hollowRows" placeholder="Rows">
+            <input type="number" id="hollowCols" placeholder="Columns">
+            <input type="number" id="hollowInitialX" placeholder="Initial X Value">
+            <input type="number" id="hollowInitialY" placeholder="Initial Y Value">
+            <input type="number" id="hollowStartBarcode" placeholder="Starting Barcode Number">
+            <input type="number" id="hollowEndBarcode" placeholder="End Barcode Number">
+            <input type="number" id="hollowDistance" placeholder="Distance Between Barcodes">
+            <select id="hollowAxis">
+                <option value="x">Increase in X Axis</option>
+                <option value="y">Increase in Y Axis</option>
+            </select>
+    
+            <button onclick="generateHollowRectangleCSV()">Generate</button>
+            <button onclick="closeModal('hollowRectangleModal')">Cancel</button>
+        </div>
+    </div>
+
+
+    <!-- Fleet Map Modal -->
+    <div id="fleetMapModal" class="modal">
+        <div class="modal-content">
+            <h2>Generate Fleet Map</h2>
+    
+            <!-- File input for Env.csv -->
+            <label for="envFile">Env.csv File:</label>
+            <input type="file" id="envFile" accept=".csv">
+    
+            <!-- Dynamic Pick Locations Section -->
+            <div id="pickSection">
+                <h3>Pick Locations</h3>
+                <div id="pickLocationsContainer">
+                    <button onclick="openPickPopup()">Pick Location</button>
+                </div>
+                <button onclick="addPickButton()">+</button>
+            </div>
+    
+            <!-- Dynamic Drop Locations Section -->
+            <div id="dropSection">
+                <h3>Drop Locations</h3>
+                <div id="dropLocationsContainer">
+                    <button onclick="openDropPopup()">Drop Location</button>
+                </div>
+                <button onclick="addDropButton()">+</button>
+            </div>
+    
+            <!-- Barcode Range Section -->
+            <div id="barcodeRangeSection">
+                <h3>Barcode Ranges</h3>
+                <div class="barcode-range-group">
+                    <input type="number" placeholder="From Marker ID" class="barcode-start">
+                    <input type="number" placeholder="To Marker ID" class="barcode-end">
+                    <button onclick="addBarcodeRange()">+</button>
+                </div>
+            </div>
+    
+            <button onclick="generateFleetMap()">Generate Map</button>
+            <button onclick="closeModal('fleetMapModal')">Cancel</button>
+        </div>
+    </div>
+    
+    <!-- Popup Modal for Pick -->
+    <div id="pickPopup" class="modal">
+        <div class="modal-content">
+            <h2>Pick Location Details</h2>
+            <!-- Conveyor Type Selection -->
+            <label for="conveyorType">Conveyor Type:</label>
+            <select id="conveyorType">
+                <option value="manual">Manual</option>
+                <option value="wait">Wait</option>
+                <option value="automated">Automated</option>
+                <option value="charge">Charge</option>
+                <option value="buffer">Buffer</option>
+                <option value="bypass">Bypass</option>
+                <option value="verified">Verified</option>
+                <option value="aperture">Aperture</option>
+            </select>
+            <!-- Distance Variation -->
+            <label for="distanceVariation">Distance Variation:</label>
+            <select id="distanceVariation">
+                <option value="-1.0">-1.0</option>
+                <option value="0">0</option>
+                <option value="1.0">1.0</option>
+            </select>
+            <!-- Distribution Type -->
+            <label for="distributionType">Distribution Type:</label>
+            <select id="distributionType">
+                <option value="Uniform">Uniform</option>
+                <option value="Normal">Normal</option>
+                <option value="Poisson">Poisson</option>
+                <option value="Manual">Manual</option>
+            </select>
+            <!-- Dock Direction -->
+            <label for="dockDirection">Dock Direction (Yaw):</label>
+            <select id="dockDirection">
+                <option value="1.0">1.0</option>
+                <option value="-1.0">-1.0</option>
+            </select>
+            <!-- Mean Distance -->
+            <label for="meanDistance">Mean Distance:</label>
+            <select id="meanDistance">
+                <option value="-1.0">-1.0</option>
+                <option value="0">0</option>
+                <option value="1.0">1.0</option>
+            </select>
+            <!-- Name (Barcode ID) -->
+            <label for="barcodeId">Name:</label>
+            <input type="text" id="barcodeId" placeholder="Enter Barcode ID">
+            <!-- Pose -->
+            <label for="poseOrientationW">Orientation - W:</label>
+            <input type="number" id="poseOrientationW">
+            <label for="poseOrientationX">Orientation - X:</label>
+            <input type="number" id="poseOrientationX">
+            <label for="poseOrientationY">Orientation - Y:</label>
+            <input type="number" id="poseOrientationY">
+            <label for="poseOrientationZ">Orientation - Z:</label>
+            <input type="number" id="poseOrientationZ">
+            <label for="posePositionX">Position - X:</label>
+            <input type="number" id="posePositionX">
+            <label for="posePositionY">Position - Y:</label>
+            <input type="number" id="posePositionY">
+            <label for="posePositionZ">Position - Z:</label>
+            <input type="number" id="posePositionZ">
+            <!-- Queue -->
+            <label for="queue">Queue:</label>
+            <input type="number" id="queue" placeholder="Default 0">
+            <!-- Queue Bias Size -->
+            <label for="queueBiasSize">Queue Bias Size:</label>
+            <input type="number" id="queueBiasSize" placeholder="Default 0.0">
+            <!-- Queue Capacity -->
+            <label for="queueCapacity">Queue Capacity:</label>
+            <input type="number" id="queueCapacity" placeholder="Default 5">
+            <!-- Queue Overflow -->
+            <label for="queueOverflow">Queue Overflow:</label>
+            <input type="number" id="queueOverflow" placeholder="Default 1.0">
+            <!-- Sleep Type -->
+            <label for="sleepType">Sleep Type:</label>
+            <select id="sleepType">
+                <option value="none">None</option>
+                <option value="pick">Pick</option>
+            </select>
+            <!-- Turn Cost -->
+            <label for="turnCostClockwise">Turn Cost - Clockwise:</label>
+            <select id="turnCostClockwise">
+                <option value="3.14">3.14</option>
+                <option value="0">0</option>
+                <option value="-1.57">-1.57</option>
+                <option value="1.57">1.57</option>
+            </select>
+            <label for="turnCostAntiClockwise">Turn Cost - AntiClockwise:</label>
+            <select id="turnCostAntiClockwise">
+                <option value="3.14">3.14</option>
+                <option value="0">0</option>
+                <option value="-1.57">-1.57</option>
+                <option value="1.57">1.57</option>
+            </select>
+            <!-- Type -->
+            <input type="hidden" id="type" value="pick">
+            <button onclick="closeModal('pickPopup')">Close</button>
+        </div>
+    </div>
+    
+    <!-- Popup Modal for Drop -->
+    <div id="dropPopup" class="modal">
+        <div class="modal-content">
+            <h2>Drop Location Details</h2>
+            <!-- Add drop-specific fields here -->
+            <!-- Conveyor Type Selection -->
+            <label for="conveyorType">Conveyor Type:</label>
+            <select id="conveyorType">
+                <option value="manual">Manual</option>
+                <option value="wait">Wait</option>
+                <option value="automated">Automated</option>
+                <option value="charge">Charge</option>
+                <option value="buffer">Buffer</option>
+                <option value="bypass">Bypass</option>
+                <option value="verified">Verified</option>
+                <option value="aperture">Aperture</option>
+            </select>
+            <!-- Dock Direction -->
+            <label for="dockDirection">Dock Direction (Yaw):</label>
+            <select id="dockDirection">
+                <option value="1.0">1.0</option>
+                <option value="-1.0">-1.0</option>
+            </select>
+            <!-- Name (Barcode ID) -->
+            <label for="barcodeId">Name:</label>
+            <input type="text" id="barcodeId" placeholder="Enter Barcode ID">
+            <!-- Pose -->
+            <label for="poseOrientationW">Orientation - W:</label>
+            <input type="number" id="poseOrientationW" value="0.0">
+            <label for="poseOrientationX">Orientation - X:</label>
+            <input type="number" id="poseOrientationX" value="0.0">
+            <label for="poseOrientationY">Orientation - Y:</label>
+            <input type="number" id="poseOrientationY" value="0.0">
+            <label for="poseOrientationZ">Orientation - Z:</label>
+            <input type="number" id="poseOrientationZ" value="0.0">
+            <label for="posePositionX">Position - X:</label>
+            <input type="number" id="posePositionX" value="0.0">
+            <label for="posePositionY">Position - Y:</label>
+            <input type="number" id="posePositionY" value="0.0">
+            <label for="posePositionZ">Position - Z:</label>
+            <input type="number" id="posePositionZ" value="0.0">
+            <!-- Sleep Type -->
+            <label for="sleepType">Sleep Type:</label>
+            <select id="sleepType">
+                <option value="none">None</option>
+                <option value="drop">Drop</option>
+            </select>
+            <!-- Turn Cost -->
+            <label for="turnCostClockwise">Turn Cost - Clockwise:</label>
+            <select id="turnCostClockwise">
+                <option value="3.14">3.14</option>
+                <option value="0">0</option>
+                <option value="-1.57">-1.57</option>
+                <option value="1.57">1.57</option>
+            </select>
+            <label for="turnCostAntiClockwise">Turn Cost - AntiClockwise:</label>
+            <select id="turnCostAntiClockwise">
+                <option value="3.14">3.14</option>
+                <option value="0">0</option>
+                <option value="-1.57">-1.57</option>
+                <option value="1.57">1.57</option>
+            </select>
+            <!-- Type -->
+            <input type="hidden" id="type" value="drop">
+            <button onclick="closeModal('dropPopup')">Close</button>
         </div>
     </div>
 
