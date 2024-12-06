@@ -1,18 +1,19 @@
 /* Styling Goes Here */
 
-/* 
-        If you want image in the background then enable this and comment out the #backgroundVideo :)
 body {
     margin: 0;
     padding: 0;
+    /*
+        If you want image in the background then enable this and comment out the #backgroundVideo :)
     background-image: url('Zippy.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
     height: 100vh;
-    overflow: hidden;
+    overflow: hidden; 
+    */
     font-family: Arial, sans-serif;
-} */
+}
 
 #backgroundVideo {
     position: fixed;
@@ -25,10 +26,27 @@ body {
 }
 
 .center-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    gap: 20px;
+}
+
+#generateEnvButton, #generateFleetMapButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+#generateEnvButton:hover, #generateFleetMapButton:hover {
+    background-color: #0056b3;
 }
 
 button {
@@ -49,21 +67,22 @@ button:hover {
 .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .modal-content {
     background: #fff;
     padding: 20px;
     border-radius: 8px;
-    width: 400px;
-    max-height: 60vh; 
+    width: 450px;
+    max-height: 60vh;
     overflow-y: auto;
     text-align: center;
 }
@@ -82,4 +101,29 @@ button:hover {
 
 #inputFieldsContainer {
     margin-bottom: 20px;
+}
+
+.pick-button-group,.drop-button-group,.barcode-range-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+h2,h3 {
+    color: #333;
+}
+
+.modal-content label {
+    margin-top: 10px;
+}
+
+.modal-content input,.modal-content select { 
+    width: 100%;
+    margin-top: 5px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.modal-content button {
+    margin-top: 15px;
 }
