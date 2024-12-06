@@ -69,7 +69,7 @@ function generateCSV() {
 
         let x = xValue, y = yValue;
         for (let i = startBarcode; i <= endBarcode; i++) {
-            rows.push([markerId++, x.toFixed(1), y.toFixed(1)]);
+            rows.push([markerId++, x.toFixed(2), y.toFixed(2)]);
             if (axis === "x") x += distance;
             else y += distance;
         }
@@ -103,8 +103,11 @@ function selectShape(shape) {
         openModal("eShapedModal");
     } else if (shape === 'H-Shaped') {
         openModal("hShapedModal");
+    } else if (shape === 'comb-Shaped') {
+        openModal("combShapedModal");
+    } else if (shape === 'hollow-Rectangle') {
+        openModal("hollowRectangleModal");
     }
-    // Add similar logic for other shapes (e.g.,'Comb-Shaped', etc.) if needed
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +136,7 @@ function generateRectangularCSV() {
         for (let c = 0; c < cols; c++) {
             if (barcode > endBarcode) break;
 
-            rowsData.push([barcode++, currentX.toFixed(1), currentY.toFixed(1)]);
+            rowsData.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
 
             if (axis === "x") {
                 currentX += distance;
@@ -190,7 +193,7 @@ function generateSquareCSV() {
         for (let c = 0; c < cols; c++) {
             if (barcode > endBarcode) break;
 
-            rowsData.push([barcode++, currentX.toFixed(1), currentY.toFixed(1)]);
+            rowsData.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
 
             if (axis === "x") {
                 currentX += distance;
@@ -260,7 +263,7 @@ function generateCShapeCSV() {
         let currentY = y;
         for (let c = 0; c < mainCols; c++) {
             if (barcode > mainEndBarcode) break;
-            rowsData.push([barcode++, currentX.toFixed(1), currentY.toFixed(1)]);
+            rowsData.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
             if (mainAxis === "x") {
                 currentX += mainDistance;
             } else {
@@ -283,7 +286,7 @@ function generateCShapeCSV() {
         let currentY = y;
         for (let c = 0; c < finger1Cols; c++) {
             if (barcode > finger1EndBarcode) break;
-            rowsData.push([barcode++, currentX.toFixed(1), currentY.toFixed(1)]);
+            rowsData.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
             if (finger1Axis === "x") {
                 currentX += finger1Distance;
             } else {
@@ -306,7 +309,7 @@ function generateCShapeCSV() {
         let currentY = y;
         for (let c = 0; c < finger2Cols; c++) {
             if (barcode > finger2EndBarcode) break;
-            rowsData.push([barcode++, currentX.toFixed(1), currentY.toFixed(1)]);
+            rowsData.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
             if (finger2Axis === "x") {
                 currentX += finger2Distance;
             } else {
@@ -385,7 +388,7 @@ function generateEShapeCSV() {
             let currentY = y;
             for (let c = 0; c < cols; c++) {
                 if (barcode > endBarcode) break;
-                data.push([barcode++, currentX.toFixed(1), currentY.toFixed(1)]);
+                data.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
                 if (axis === "x") {
                     currentX += distance;
                 } else {
@@ -416,7 +419,328 @@ function generateEShapeCSV() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-//                                  H-Shaped                                                 //
+//                                  Comb-Shaped                                              //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+function addFinger() {
+    const fingersContainer = document.getElementById("combFingersContainer");
+    const newFinger = document.createElement("div");
+    newFinger.classList.add("finger-inputs");
+    newFinger.innerHTML = `
+        <h3>Finger ${fingersContainer.children.length + 1}</h3>
+        <input type="number" placeholder="Rows" class="fingerRows">
+        <input type="number" placeholder="Columns" class="fingerCols">
+        <input type="number" placeholder="Initial X Value" class="fingerInitialX">
+        <input type="number" placeholder="Initial Y Value" class="fingerInitialY">
+        <input type="number" placeholder="Starting Barcode" class="fingerStartBarcode">
+        <input type="number" placeholder="End Barcode" class="fingerEndBarcode">
+        <input type="number" placeholder="Distance Between Barcodes" class="fingerDistance">
+        <select class="fingerAxis">
+            <option value="x">Increase in X Axis</option>
+            <option value="y">Increase in Y Axis</option>
+        </select>
+    `;
 
+    fingersContainer.appendChild(newFinger);
+}
+function generateCombShapeCSV() {
+    const rowsData = [["marker id", "x_value", "y_value"]];
+    // Main Rectangle inputs
+    const mainRows = parseInt(document.getElementById("combMainRows").value);
+    const mainCols = parseInt(document.getElementById("combMainCols").value);
+    const mainInitialX = parseFloat(document.getElementById("combMainInitialX").value);
+    const mainInitialY = parseFloat(document.getElementById("combMainInitialY").value);
+    const mainStartBarcode = parseInt(document.getElementById("combMainStartBarcode").value);
+    const mainEndBarcode = parseInt(document.getElementById("combMainEndBarcode").value);
+    const mainDistance = parseFloat(document.getElementById("combMainDistance").value);
+    const mainAxis = document.getElementById("combMainAxis").value;
+    rowsData.push(...generateRectangle(mainRows, mainCols, mainInitialX, mainInitialY, mainStartBarcode, mainEndBarcode, mainDistance, mainAxis));
+    // Finger inputs
+    const fingerInputs = document.querySelectorAll("#combFingersContainer .finger-inputs");
+    fingerInputs.forEach(finger => {
+        const rows = parseInt(finger.querySelector(".fingerRows").value);
+        const cols = parseInt(finger.querySelector(".fingerCols").value);
+        const initialX = parseFloat(finger.querySelector(".fingerInitialX").value);
+        const initialY = parseFloat(finger.querySelector(".fingerInitialY").value);
+        const startBarcode = parseInt(finger.querySelector(".fingerStartBarcode").value);
+        const endBarcode = parseInt(finger.querySelector(".fingerEndBarcode").value);
+        const distance = parseFloat(finger.querySelector(".fingerDistance").value);
+        const axis = finger.querySelector(".fingerAxis").value;
+        rowsData.push(...generateRectangle(rows, cols, initialX, initialY, startBarcode, endBarcode, distance, axis));
+    });
+    let csvContent = "data:text/csv;charset=utf-8," + rowsData.map(e => e.join(",")).join("\n");
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", "comb_shape_env.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+function generateRectangle(rows, cols, initialX, initialY, startBarcode, endBarcode, distance, axis) {
+    let barcode = startBarcode;
+    let x = initialX;
+    let y = initialY;
+    const data = [];
+    for (let r = 0; r < rows; r++) {
+        let currentX = x;
+        let currentY = y;
+        for (let c = 0; c < cols; c++) {
+            if (barcode > endBarcode) break;
+            data.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
+            if (axis === "x") {
+                currentX += distance;
+            } else {
+                currentY += distance;
+            }
+        }
+        if (axis === "x") {
+            y += distance;
+        } else {
+            x += distance;
+        }
+    }
+    return data;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//                                  Hollow Rectangle                                         //
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+function generateHollowRectangleCSV() {
+    // Hollow Rectangle inputs
+    const rows = parseInt(document.getElementById("hollowRows").value);
+    const cols = parseInt(document.getElementById("hollowCols").value);
+    const initialX = parseFloat(document.getElementById("hollowInitialX").value);
+    const initialY = parseFloat(document.getElementById("hollowInitialY").value);
+    const startBarcode = parseInt(document.getElementById("hollowStartBarcode").value);
+    const endBarcode = parseInt(document.getElementById("hollowEndBarcode").value);
+    const distance = parseFloat(document.getElementById("hollowDistance").value);
+    const axis = document.getElementById("hollowAxis").value;
+
+    const rowsData = [["marker id", "x_value", "y_value"]];
+
+    let barcode = startBarcode;
+    let x = initialX;
+    let y = initialY;
+
+    function generatePerimeter(rows, cols, startX, startY, distance, axis) {
+        const data = [];
+        let currentX = startX;
+        let currentY = startY;
+
+        // Top row
+        for (let c = 0; c < cols && barcode <= endBarcode; c++) {
+            data.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
+            currentX += (axis === "x") ? distance : 0;
+            currentY += (axis === "y") ? distance : 0;
+        }
+
+        // Right column
+        for (let r = 1; r < rows - 1 && barcode <= endBarcode; r++) {
+            currentX -= (axis === "y") ? distance : 0;
+            currentY += (axis === "x") ? distance : 0;
+            data.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
+        }
+
+        // Bottom row (if more than 1 row)
+        if (rows > 1) {
+            for (let c = cols - 1; c >= 0 && barcode <= endBarcode; c--) {
+                currentX -= (axis === "x") ? distance : 0;
+                currentY -= (axis === "y") ? distance : 0;
+                data.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
+            }
+        }
+
+        // Left column (if more than 1 column)
+        if (cols > 1) {
+            for (let r = rows - 2; r > 0 && barcode <= endBarcode; r--) {
+                currentX += (axis === "y") ? distance : 0;
+                currentY -= (axis === "x") ? distance : 0;
+                data.push([barcode++, currentX.toFixed(2), currentY.toFixed(2)]);
+            }
+        }
+
+        return data;
+    }
+
+    // Generate perimeter data
+    rowsData.push(...generatePerimeter(rows, cols, x, y, distance, axis));
+
+    // Export to CSV
+    let csvContent = "data:text/csv;charset=utf-8," + rowsData.map(e => e.join(",")).join("\n");
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", "hollow_rectangle_env.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//                                  Fleet-Map                                               //
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+// Open the main Fleet Map Modal
+function openFleetMapModal() {
+    document.getElementById("fleetMapModal").style.display = "flex";
+}
+
+// Close any modal by ID
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+}
+
+// Open pop-up for Pick and Drop Locations
+function openPickPopup() {
+    document.getElementById("pickPopup").style.display = "flex";
+}
+
+function openDropPopup() {
+    document.getElementById("dropPopup").style.display = "flex";
+}
+
+// Function to add a new "Pick Location" button
+function addPickButton() {
+    const pickContainer = document.getElementById("pickLocationsContainer");
+    const newPickButton = document.createElement("button");
+    newPickButton.textContent = "Pick Location";
+    newPickButton.onclick = openPickPopup;
+    pickContainer.appendChild(newPickButton);
+}
+
+// Function to add a new "Drop Location" button
+function addDropButton() {
+    const dropContainer = document.getElementById("dropLocationsContainer");
+    const newDropButton = document.createElement("button");
+    newDropButton.textContent = "Drop Location";
+    newDropButton.onclick = openDropPopup;
+    dropContainer.appendChild(newDropButton);
+}
+
+// Add a new Barcode Range input field
+function addBarcodeRange() {
+    const barcodeRangeSection = document.getElementById("barcodeRangeSection");
+    const newRangeGroup = document.createElement("div");
+    newRangeGroup.classList.add("barcode-range-group");
+    newRangeGroup.innerHTML = `
+        <input type="number" placeholder="From Marker ID" class="barcode-start">
+        <input type="number" placeholder="To Marker ID" class="barcode-end">`;
+    barcodeRangeSection.appendChild(newRangeGroup);
+}
+
+// Placeholder function to generate the Fleet Map
+function generateFleetMap() {
+    // Logic for fleet map generation
+    alert("Fleet map generated successfully.");
+}
+
+// Event listener to open the modal when #generateFleetMapButton is clicked
+document.getElementById("generateFleetMapButton").addEventListener("click", openFleetMapModal);
+
+
+//////////////////////////////////picklogic////////////////
+
+function openPickPopup() {
+    document.getElementById("pickPopup").style.display = "block";
+}
+
+function savePickLocation() {
+    const pickLocation = {
+        conveyorType: document.getElementById("conveyorType").value || "manual",
+        distanceVariation: document.getElementById("distanceVariation").value || "-1.0",
+        distributionType: document.getElementById("distributionType").value || "Uniform",
+        dockDirection: document.getElementById("dockDirection").value || "1.0",
+        meanDistance: document.getElementById("meanDistance").value || "-1.0",
+        name: document.getElementById("name").value,
+        pose: {
+            orientation: {
+                w: parseFloat(document.getElementById("orientationW").value),
+                x: parseFloat(document.getElementById("orientationX").value),
+                y: parseFloat(document.getElementById("orientationY").value),
+                z: parseFloat(document.getElementById("orientationZ").value)
+            },
+            position: {
+                x: parseFloat(document.getElementById("positionX").value),
+                y: parseFloat(document.getElementById("positionY").value),
+                z: parseFloat(document.getElementById("positionZ").value)
+            }
+        },
+        queue: parseInt(document.getElementById("queue").value) || 0,
+        queueBiasSize: parseFloat(document.getElementById("queueBiasSize").value) || 0.0,
+        queueCapacity: parseInt(document.getElementById("queueCapacity").value) || 5,
+        queueOverflow: parseFloat(document.getElementById("queueOverflow").value) || 1.0,
+        sleepType: document.getElementById("sleepType").value || "none",
+        turnCost: {
+            clockwise: parseFloat(document.getElementById("turnCostClockwise").value) || 3.14,
+            antiClockwise: parseFloat(document.getElementById("turnCostAntiClockwise").value) || 3.14
+        },
+        type: "pick"
+    };
+
+    console.log("Saved Pick Location:", pickLocation); // This logs the saved data for now.
+
+    // Close the modal after saving
+    closeModal('pickPopup');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+}
+
+///////////////////////////////droplocation/////////////////
+
+function openDropPopup() {
+    document.getElementById('dropPopup').style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function generateDropData() {
+    const conveyorType = document.getElementById('conveyorType').value;
+    const dockDirection = document.getElementById('dockDirection').value;
+    const barcodeId = document.getElementById('barcodeId').value;
+    const poseOrientationW = document.getElementById('poseOrientationW').value;
+    const poseOrientationX = document.getElementById('poseOrientationX').value;
+    const poseOrientationY = document.getElementById('poseOrientationY').value;
+    const poseOrientationZ = document.getElementById('poseOrientationZ').value;
+    const posePositionX = document.getElementById('posePositionX').value;
+    const posePositionY = document.getElementById('posePositionY').value;
+    const posePositionZ = document.getElementById('posePositionZ').value;
+    const sleepType = document.getElementById('sleepType').value;
+    const turnCostClockwise = document.getElementById('turnCostClockwise').value;
+    const turnCostAntiClockwise = document.getElementById('turnCostAntiClockwise').value;
+
+    const dropLocationData = {
+        "conveyorType": conveyorType,
+        "dockDirection": {
+            "yaw": parseFloat(dockDirection)
+        },
+        "name": barcodeId,
+        "pose": {
+            "orientation": {
+                "w": parseFloat(poseOrientationW),
+                "x": parseFloat(poseOrientationX),
+                "y": parseFloat(poseOrientationY),
+                "z": parseFloat(poseOrientationZ)
+            },
+            "position": {
+                "x": parseFloat(posePositionX),
+                "y": parseFloat(posePositionY),
+                "z": parseFloat(posePositionZ)
+            }
+        },
+        "sleepType": sleepType,
+        "turnCost": {
+            "Clockwise": parseFloat(turnCostClockwise),
+            "antiClockwise": parseFloat(turnCostAntiClockwise)
+        },
+        "type": "drop"
+    };
+
+    console.log('Generated Drop Data:', dropLocationData);
+
+    // You can send this data to the server or handle it as needed.
+}
