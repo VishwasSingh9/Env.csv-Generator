@@ -17,7 +17,7 @@ function closeModal(modalId) {
     modal.style.display = "none";
 }
 
-// Irregular Shape Modal 
+// Irregular Shape Modal
 function openIrregularShapeModal() {
     closeModal("shapeSelectionModal");
     openModal("irregularShapeModal");
@@ -44,7 +44,7 @@ function addIrregularShapeFields() {
         <input type="number" placeholder="End Barcode" class="barcode-end">
         <input type="number" placeholder="Initial x-value" class="x-value">
         <input type="number" placeholder="Initial y-value" class="y-value">
-        <input type="number" placeholder="Distance between barcodes" class="distance">
+        <input type="number" placeholder="Distance between bar-codes" class="distance">
         <select class="axis">
             <option value="x">Increase in X</option>
             <option value="y">Increase in Y</option>
@@ -92,7 +92,7 @@ function generateCSV() {
 
 // Regular shape based on user selection
 function selectShape(shape) {
-    closeModal("regularShapeModal"); 
+    closeModal("regularShapeModal");
     if (shape === 'Rectangular') {
         openModal("rectangularShapeModal");
     } else if (shape === 'Square') {
@@ -576,14 +576,13 @@ function generateHollowRectangleCSV() {
     document.body.removeChild(link);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
-//                                  Fleet-Map                                               //
+//                                  PNG                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-// Open the main Fleet Map Modal
-function openFleetMapModal() {
-    document.getElementById("fleetMapModal").style.display = "flex";
+// Open the PNG Modal
+function openPngModal() {
+    document.getElementById("pngModal").style.display = "flex";
 }
 
 // Close any modal by ID
@@ -591,156 +590,171 @@ function closeModal(modalId) {
     document.getElementById(modalId).style.display = "none";
 }
 
-// Open pop-up for Pick and Drop Locations
-function openPickPopup() {
-    document.getElementById("pickPopup").style.display = "flex";
+// Function to open the CSV input modal
+function openCsvInputModal() {
+    openModal("csvInputModal");
 }
 
-function openDropPopup() {
-    document.getElementById("dropPopup").style.display = "flex";
+// Function to open the FleetMap input modal
+function openFleetMapInputModal() {
+    openModal("fleetMapInputModal");
 }
 
-// Function to add a new "Pick Location" button
-function addPickButton() {
-    const pickContainer = document.getElementById("pickLocationsContainer");
-    const newPickButton = document.createElement("button");
-    newPickButton.textContent = "Pick Location";
-    newPickButton.onclick = openPickPopup;
-    pickContainer.appendChild(newPickButton);
-}
+//Function to process the uploaded CSV file
+function processCsvFile() {
+    const fileInput = document.getElementById("csvFileInput");
+    if (fileInput.files.length === 0) {
+        return console.error("Error: No CSV file selected.");
+    }
 
-// Function to add a new "Drop Location" button
-function addDropButton() {
-    const dropContainer = document.getElementById("dropLocationsContainer");
-    const newDropButton = document.createElement("button");
-    newDropButton.textContent = "Drop Location";
-    newDropButton.onclick = openDropPopup;
-    dropContainer.appendChild(newDropButton);
-}
+    const file = fileInput.files[0];
+    const reader = new FileReader();
 
-// Add a new Barcode Range input field
-function addBarcodeRange() {
-    const barcodeRangeSection = document.getElementById("barcodeRangeSection");
-    const newRangeGroup = document.createElement("div");
-    newRangeGroup.classList.add("barcode-range-group");
-    newRangeGroup.innerHTML = `
-        <input type="number" placeholder="From Marker ID" class="barcode-start">
-        <input type="number" placeholder="To Marker ID" class="barcode-end">`;
-    barcodeRangeSection.appendChild(newRangeGroup);
-}
+    reader.onload = (e) => {
+        const rows = e.target.result
+            .split("\n")
+            .map(row => row.split(",").map(cell => cell.trim()));
 
-// Placeholder function to generate the Fleet Map
-function generateFleetMap() {
-    // Logic for fleet map generation
-    alert("Fleet map generated successfully.");
-}
+        const [header, ...data] = rows;
+        const xIndex = header.indexOf("x_value");
+        const yIndex = header.indexOf("y_value");
 
-// Event listener to open the modal when #generateFleetMapButton is clicked
-document.getElementById("generateFleetMapButton").addEventListener("click", openFleetMapModal);
+        if (xIndex === -1 || yIndex === -1 || data.length === 0) {
+            return console.error("Error: CSV must contain valid 'x_value' and 'y_value' columns.");
+        }
 
+        const coordinates = data
+            .map(row => ({ x: parseFloat(row[xIndex]), y: parseFloat(row[yIndex]) }))
+            .filter(coord => !isNaN(coord.x) && !isNaN(coord.y));
 
-//////////////////////////////////picklogic////////////////
+        if (coordinates.length === 0) {
+            return console.error("Error: No valid x and y values in CSV file.");
+        }
 
-function openPickPopup() {
-    document.getElementById("pickPopup").style.display = "block";
-}
-
-function savePickLocation() {
-    const pickLocation = {
-        conveyorType: document.getElementById("conveyorType").value || "manual",
-        distanceVariation: document.getElementById("distanceVariation").value || "-1.0",
-        distributionType: document.getElementById("distributionType").value || "Uniform",
-        dockDirection: document.getElementById("dockDirection").value || "1.0",
-        meanDistance: document.getElementById("meanDistance").value || "-1.0",
-        name: document.getElementById("name").value,
-        pose: {
-            orientation: {
-                w: parseFloat(document.getElementById("orientationW").value),
-                x: parseFloat(document.getElementById("orientationX").value),
-                y: parseFloat(document.getElementById("orientationY").value),
-                z: parseFloat(document.getElementById("orientationZ").value)
-            },
-            position: {
-                x: parseFloat(document.getElementById("positionX").value),
-                y: parseFloat(document.getElementById("positionY").value),
-                z: parseFloat(document.getElementById("positionZ").value)
-            }
-        },
-        queue: parseInt(document.getElementById("queue").value) || 0,
-        queueBiasSize: parseFloat(document.getElementById("queueBiasSize").value) || 0.0,
-        queueCapacity: parseInt(document.getElementById("queueCapacity").value) || 5,
-        queueOverflow: parseFloat(document.getElementById("queueOverflow").value) || 1.0,
-        sleepType: document.getElementById("sleepType").value || "none",
-        turnCost: {
-            clockwise: parseFloat(document.getElementById("turnCostClockwise").value) || 3.14,
-            antiClockwise: parseFloat(document.getElementById("turnCostAntiClockwise").value) || 3.14
-        },
-        type: "pick"
+        generateDotGrid(coordinates);
     };
 
-    console.log("Saved Pick Location:", pickLocation); // This logs the saved data for now.
-
-    // Close the modal after saving
-    closeModal('pickPopup');
+    reader.readAsText(file);
 }
 
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = "none";
+function generateDotGrid(coordinates) {
+    const canvas = document.getElementById("dotGridCanvas") || document.createElement("canvas");
+    if (!canvas.id) {
+        canvas.id = "dotGridCanvas";
+        document.body.appendChild(canvas);
+    }
+
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth - 20;
+    canvas.height = window.innerHeight - 20;
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const margin = 50, dotSize = 5;
+
+    const [minX, maxX] = [Math.min(...coordinates.map(c => c.x)), Math.max(...coordinates.map(c => c.x))];
+    const [minY, maxY] = [Math.min(...coordinates.map(c => c.y)), Math.max(...coordinates.map(c => c.y))];
+    const scaleX = (canvas.width - 2 * margin) / (maxX - minX);
+    const scaleY = (canvas.height - 2 * margin) / (maxY - minY);
+
+    coordinates.forEach(({ x, y }) => {
+        const canvasX = margin + (x - minX) * scaleX;
+        const canvasY = canvas.height - margin - (y - minY) * scaleY;
+        ctx.beginPath();
+        ctx.arc(canvasX, canvasY, dotSize, 0, Math.PI * 2);
+        ctx.fillStyle = "black";
+        ctx.fill();
+    });
+
+    console.log("Dot grid generated successfully.");
+    downloadImage(canvas);
 }
 
-///////////////////////////////droplocation/////////////////
-
-function openDropPopup() {
-    document.getElementById('dropPopup').style.display = 'block';
+function downloadImage(canvas) {
+    const link = document.createElement("a");
+    link.download = "dot_grid_image.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
 }
 
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
-}
+//Function to process the uploaded Fleet Map file
 
-function generateDropData() {
-    const conveyorType = document.getElementById('conveyorType').value;
-    const dockDirection = document.getElementById('dockDirection').value;
-    const barcodeId = document.getElementById('barcodeId').value;
-    const poseOrientationW = document.getElementById('poseOrientationW').value;
-    const poseOrientationX = document.getElementById('poseOrientationX').value;
-    const poseOrientationY = document.getElementById('poseOrientationY').value;
-    const poseOrientationZ = document.getElementById('poseOrientationZ').value;
-    const posePositionX = document.getElementById('posePositionX').value;
-    const posePositionY = document.getElementById('posePositionY').value;
-    const posePositionZ = document.getElementById('posePositionZ').value;
-    const sleepType = document.getElementById('sleepType').value;
-    const turnCostClockwise = document.getElementById('turnCostClockwise').value;
-    const turnCostAntiClockwise = document.getElementById('turnCostAntiClockwise').value;
+function processFleetMapFile() {
+    const fileInput = document.getElementById("mapFileInput");
+    if (fileInput.files.length === 0) {
+        return console.error("Error: No MAP file selected.");
+    }
 
-    const dropLocationData = {
-        "conveyorType": conveyorType,
-        "dockDirection": {
-            "yaw": parseFloat(dockDirection)
-        },
-        "name": barcodeId,
-        "pose": {
-            "orientation": {
-                "w": parseFloat(poseOrientationW),
-                "x": parseFloat(poseOrientationX),
-                "y": parseFloat(poseOrientationY),
-                "z": parseFloat(poseOrientationZ)
-            },
-            "position": {
-                "x": parseFloat(posePositionX),
-                "y": parseFloat(posePositionY),
-                "z": parseFloat(posePositionZ)
-            }
-        },
-        "sleepType": sleepType,
-        "turnCost": {
-            "Clockwise": parseFloat(turnCostClockwise),
-            "antiClockwise": parseFloat(turnCostAntiClockwise)
-        },
-        "type": "drop"
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        let data;
+        try {
+            data = JSON.parse(e.target.result);
+        } catch (error) {
+            return console.error("Error decoding JSON: ", error);
+        }
+
+        if (!data.nodes) {
+            return console.error("Error: 'nodes' key not found in the JSON data.");
+        }
+
+        const positions = data.nodes.map(node => {
+            const position = node.pose?.position;
+            const x = position?.x;
+            const y = position?.y;
+            return (x != null && y != null) ? { x, y } : null;
+        }).filter(coord => coord !== null);
+
+        if (positions.length === 0) {
+            return console.error("Error: No valid positions found in the 'nodes' data.");
+        }
+
+        generateDotGrid(positions);
     };
 
-    console.log('Generated Drop Data:', dropLocationData);
+    reader.readAsText(file);
+}
 
-    // You can send this data to the server or handle it as needed.
+function generateDotGrid(positions) {
+    const canvas = document.getElementById("dotGridCanvas") || document.createElement("canvas");
+    if (!canvas.id) {
+        canvas.id = "dotGridCanvas";
+        document.body.appendChild(canvas);
+    }
+
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth - 20;
+    canvas.height = window.innerHeight - 20;
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const margin = 50, dotSize = 5;
+
+    const [minX, maxX] = [Math.min(...positions.map(c => c.x)), Math.max(...positions.map(c => c.x))];
+    const [minY, maxY] = [Math.min(...positions.map(c => c.y)), Math.max(...positions.map(c => c.y))];
+    const scaleX = (canvas.width - 2 * margin) / (maxX - minX);
+    const scaleY = (canvas.height - 2 * margin) / (maxY - minY);
+
+    positions.forEach(({ x, y }) => {
+        const canvasX = margin + (x - minX) * scaleX;
+        const canvasY = canvas.height - margin - (y - minY) * scaleY;
+        ctx.beginPath();
+        ctx.arc(canvasX, canvasY, dotSize, 0, Math.PI * 2);
+        ctx.fillStyle = "black";
+        ctx.fill();
+    });
+
+    console.log("Dot grid generated successfully.");
+    downloadImage(canvas);
+}
+
+function downloadImage(canvas) {
+    const link = document.createElement("a");
+    link.download = "dot_grid_image.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
 }
