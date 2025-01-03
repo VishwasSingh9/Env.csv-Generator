@@ -600,6 +600,10 @@ function openFleetMapInputModal() {
     openModal("fleetMapInputModal");
 }
 
+function openFleetMapInputModal2() {
+    openModal("fleetMapInputModal2");
+}
+
 //Function to process the uploaded CSV file
 function processCsvFile() {
     const fileInput = document.getElementById("csvFileInput");
@@ -758,3 +762,99 @@ function downloadImage(canvas) {
     link.href = canvas.toDataURL("image/png");
     link.click();
 }
+
+
+////////////////////////////// .map to .json converter //////////////////////
+
+function triggerFileInput() {
+    const fileInput = document.getElementById("mapRenameFileInput");
+    fileInput.click();
+}
+function renameMapToJson() {
+    const fileInput = document.getElementById("mapRenameFileInput"); // Updated id
+    if (fileInput.files.length === 0) {
+        return console.error("Error: No MAP file selected.");
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        const fileContent = e.target.result;
+
+        const newFileName = file.name.replace(/\.map$/, ".json");
+
+        const blob = new Blob([fileContent], { type: "application/json" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = newFileName;
+        link.click();
+
+        console.log(`File renamed and saved as ${newFileName}`);
+    };
+
+    reader.readAsText(file);
+
+    fileInput.value = "";
+}
+
+/////////////////////////// .map to .csv ///////////////////////////////////////
+
+function processFleetMapFile2() {
+    const fileInput = document.getElementById("map2FileInput");
+    if (fileInput.files.length === 0) {
+        return console.error("Error: No JSON file selected.");
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        let data;
+        try {
+            data = JSON.parse(e.target.result);
+        } catch (error) {
+            return console.error("Error decoding JSON: ", error);
+        }
+
+        if (!data.nodes) {
+            return console.error("Error: 'nodes' key not found in the JSON data.");
+        }
+
+        const positions = data.nodes.map(node => {
+            const position = node.pose?.position;
+            const x = position?.x;
+            const y = position?.y;
+            return (x != null && y != null) ? { x, y } : null;
+        }).filter(coord => coord !== null);
+
+        if (positions.length === 0) {
+            return console.error("Error: No valid positions found in the 'nodes' data.");
+        }
+
+        generateCSV(positions);
+    };
+
+    reader.readAsText(file);
+}
+
+function generateCSV(positions) {
+    positions.sort((a, b) => a.x - b.x);
+
+    const header = "x_value,y_value\n";
+    const rows = positions.map(({ x, y }) => `${x},${y}`).join("\n");
+    const csvContent = header + rows;
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.download = "env.csv";
+    link.href = URL.createObjectURL(blob);
+    link.click();
+
+    console.log("env.csv generated successfully.");
+}
+
+//////
+///////
+///////////
+//////////////
