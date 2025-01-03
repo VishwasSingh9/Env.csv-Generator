@@ -20,10 +20,13 @@
     <div class="center-button">
         <button id="generateEnvButton">Generate Env.csv</button>
         <button id="generatePngButton" onclick="openPngModal()">Generate PNG</button>
+        <button onclick="triggerFileInput()">Convert .map to .json</button>
+        <input type="file" id="mapRenameFileInput" accept=".map" style="display: none;" onchange="renameMapToJson()" />
+        <button onclick="openModal('fleetMapInputModal2')">Generate FleetMap to CSV</button>
     </div>
 
     <!-- env.csv -->
-     
+
     <!-- Initial Shape Selection Modal -->
     <div id="shapeSelectionModal" class="modal">
         <div class="modal-content">
@@ -283,6 +286,7 @@
             <h2>Generate PNG</h2>
             <button onclick="openCsvInputModal()">Using CSV</button>
             <button onclick="openFleetMapInputModal()">Using Fleet-Map</button>
+            <button onclick="openFleetMapInputModal2()">Using Fleet-Map2</button>
             <button onclick="closeModal('pngModal')">Cancel</button>
         </div>
     </div>
@@ -305,7 +309,7 @@
     <!-- FleetMap Input Modal -->
     <div id="fleetMapInputModal" class="modal">
             <div class="modal-content">
-                <h2>Upload CSV File</h2>
+                <h2>Upload Map File</h2>
                 <div class="input-container">
                     <input type="file" id="mapFileInput" accept=".json">
                     <div class="modal-buttons">
@@ -316,6 +320,19 @@
             </div>
     </div>
 
+    <!-- Modal for file input -->
+    <div id="fleetMapInputModal2" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Fleet Map to CSV Converter</h2>
+            <div class="input-container">
+                <input type="file" id="map2FileInput" accept=".json">
+                <div class="modal-buttons">
+                    <button onclick="processFleetMapFile2()">Generate CSV</button>
+                    <button onclick="closeModal('fleetMapInputModal2')">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <script src="script.js"></script>
